@@ -17,12 +17,18 @@ function createPrismaClient(): PrismaClient {
   return new PrismaClient({ adapter });
 }
 
-// Singleton pattern — reuse client in dev to avoid exhausting connections
-export const db = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = db;
-}
+/**
+ * Lazy-initialized Prisma singleton.
+ * Won't throw at import time if DATABASE_URL is missing — only on first query.
+ */
+export const db = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    if (!globalForPrisma.prisma) {
+      globalForPrisma.prisma = createPrismaClient();
+    }
+    return Reflect.get(globalForPrisma.prisma, prop);
+  },
+});
 
 // Re-export Prisma types for convenience
 export * from "@prisma/client";

@@ -7,7 +7,8 @@
     "./validators/*": "./src/validators/*.ts",
     "./types": "./src/types.ts",
     "./constants": "./src/constants.ts",
-    "./events": "./src/events.ts"
+    "./events": "./src/events.ts",
+    "./handoff": "./src/handoff.ts"
   },
   "scripts": {
     "type-check": "tsc --noEmit"
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@juicebox/config": "workspace:*",
     "@juicebox/db": "workspace:*",
+    "@types/node": "^22.15.0",
     "typescript": "^5.9.2"
   }
 }
