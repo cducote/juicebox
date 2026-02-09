@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "test:e2e": "playwright test",
     "clean": "rm -rf .next .turbo"
   },
   "dependencies": {
@@ -20,18 +21,20 @@
     "@juicebox/storage": "workspace:*",
     "@juicebox/stripe": "workspace:*",
     "@juicebox/ui": "workspace:*",
-    "stripe": "^17.7.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.513.0",
     "next": "^16.1.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "stripe": "^17.7.0",
     "svix": "^1.84.1",
     "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
+    "@clerk/testing": "^1.13.35",
     "@juicebox/config": "workspace:*",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.0",
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.4",

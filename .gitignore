@@ -27,6 +27,7 @@ prisma/generated/
 # Test results
 test-results/
 playwright-report/
+playwright/.clerk/
 
 # Misc
 *.log
