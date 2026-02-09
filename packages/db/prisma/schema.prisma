@@ -1,0 +1,318 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ──────────────────────────────────────────────
+// Enums
+// ──────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  EMPLOYEE
+  CUSTOMER
+}
+
+enum ProjectStatus {
+  PLANNING
+  AGREEMENT_PENDING
+  PAYMENT_SETUP
+  ACTIVE
+  PAUSED
+  SUSPENDED
+  COMPLETED
+  HANDED_OFF
+}
+
+enum DealType {
+  INSTALLMENT
+  EQUITY
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  BLOCKED
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum EpicStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum NotificationType {
+  PAYMENT_RECEIVED
+  PAYMENT_MISSED
+  GRACE_PERIOD_WARNING
+  STATUS_CHANGE
+  HANDOFF_READY
+  GENERAL
+}
+
+enum RecurringInterval {
+  MONTHLY
+  YEARLY
+}
+
+// ──────────────────────────────────────────────
+// Models
+// ──────────────────────────────────────────────
+
+model User {
+  id       String   @id @default(cuid())
+  clerkId  String   @unique
+  email    String   @unique
+  name     String?
+  role     UserRole @default(CUSTOMER)
+  imageUrl String?
+
+  projects      Project[]      @relation("ClientProjects")
+  assignedTasks Task[]         @relation("AssignedTasks")
+  notifications Notification[]
+  expenses      Expense[]      @relation("CreatedExpenses")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  slug        String        @unique
+  status      ProjectStatus @default(PLANNING)
+  dealType    DealType      @default(INSTALLMENT)
+
+  // Client relationship
+  clientId String?
+  client   User?   @relation("ClientProjects", fields: [clientId], references: [id])
+
+  // Payment tracking (amounts in cents)
+  totalAmount  Int @default(0)
+  termMonths   Int @default(0)
+  monthlyPayment Int @default(0)
+  amountPaid   Int @default(0)
+  missedPayments Int @default(0)
+
+  // Stripe
+  stripeSubscriptionId String?
+  stripeCustomerId     String?
+
+  // Grace period
+  gracePeriodMonths    Int       @default(3)
+  gracePeriodStartedAt DateTime?
+
+  // Metadata
+  targetCompletionDate DateTime?
+  notes                String?
+
+  // Relations
+  epics        Epic[]
+  tasks        Task[]
+  payments     Payment[]
+  expenses     Expense[]
+  documents    Document[]
+  handoffItems HandoffItem[]
+  notifications Notification[]
+  activityLogs ActivityLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([status])
+  @@index([slug])
+  @@map("projects")
+}
+
+model Epic {
+  id          String     @id @default(cuid())
+  title       String
+  description String?
+  status      EpicStatus @default(TODO)
+  sortOrder   Int        @default(0)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  tasks Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("epics")
+}
+
+model Task {
+  id          String       @id @default(cuid())
+  title       String
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  sortOrder   Int          @default(0)
+  dueDate     DateTime?
+  notes       String?
+  isMilestone Boolean      @default(false)
+
+  epicId String?
+  epic   Epic?   @relation(fields: [epicId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  assigneeId String?
+  assignee   User?   @relation("AssignedTasks", fields: [assigneeId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([epicId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map("tasks")
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  amount                Int // cents
+  stripeInvoiceId       String?       @unique
+  stripePaymentIntentId String?
+  status                PaymentStatus @default(PENDING)
+  paidAt                DateTime?
+  isPayoff              Boolean       @default(false)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Expense {
+  id          String  @id @default(cuid())
+  name        String
+  amount      Int // cents
+  description String?
+  category    String? // e.g. "Software", "Domain", "Hosting", "Marketing", "Other"
+  receiptUrl  String? // R2 object URL
+
+  // Optional project association (null = general business expense)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  date              DateTime
+  isRecurring       Boolean            @default(false)
+  recurringInterval RecurringInterval?
+
+  createdById String
+  createdBy   User   @relation("CreatedExpenses", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@index([date])
+  @@index([isRecurring])
+  @@map("expenses")
+}
+
+model Document {
+  id    String @id @default(cuid())
+  title String
+  url   String // R2 object URL
+  type  String @default("other") // "agreement", "invoice", "other"
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("documents")
+}
+
+model HandoffItem {
+  id          String    @id @default(cuid())
+  label       String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  notes       String?
+  sortOrder   Int       @default(0)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+  @@map("handoff_items")
+}
+
+model Notification {
+  id       String           @id @default(cuid())
+  type     NotificationType
+  title    String
+  message  String
+  read     Boolean          @default(false)
+  metadata Json? // Deep linking data
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, read])
+  @@index([projectId])
+  @@map("notifications")
+}
+
+model ActivityLog {
+  id       String @id @default(cuid())
+  action   String
+  actor    String // clerkId or "system"
+  metadata Json?  // Additional context
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@map("activity_logs")
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@juicebox/stripe",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./client": "./src/client.ts",
+    "./subscriptions": "./src/subscriptions.ts",
+    "./webhooks": "./src/webhooks.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "stripe": "^17.7.0"
+  },
+  "devDependencies": {
+    "@juicebox/config": "workspace:*",
+    "@juicebox/db": "workspace:*",
+    "typescript": "^5.9.2"
+  }
+}

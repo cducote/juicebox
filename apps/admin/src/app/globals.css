@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@import "@juicebox/ui/theme.css";
+
+/* Include shared UI package in Tailwind's content scan */
+@source "../../../../packages/ui/src/**/*.{ts,tsx}";
+
+/* Base styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-surface text-text-primary font-sans antialiased;
+  }
+}

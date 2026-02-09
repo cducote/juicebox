@@ -1,0 +1,20 @@
+{
+  "name": "@juicebox/storage",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.800.0",
+    "@aws-sdk/s3-request-presigner": "^3.800.0"
+  },
+  "devDependencies": {
+    "@juicebox/config": "workspace:*",
+    "typescript": "^5.9.2"
+  }
+}

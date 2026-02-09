@@ -1,0 +1,19 @@
+{
+  "name": "@juicebox/email",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "resend": "^4.1.0"
+  },
+  "devDependencies": {
+    "@juicebox/config": "workspace:*",
+    "typescript": "^5.9.2"
+  }
+}

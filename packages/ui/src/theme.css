@@ -1,0 +1,49 @@
+/* Juicebox Studios — Shared Design Tokens (Tailwind v4) */
+@theme {
+  /* Brand Colors */
+  --color-juice-50: #fef9ec;
+  --color-juice-100: #fdf0c8;
+  --color-juice-200: #fbe08d;
+  --color-juice-300: #f9ca52;
+  --color-juice-400: #f7b72a;
+  --color-juice-500: #f19a11;
+  --color-juice-600: #d5740b;
+  --color-juice-700: #b1510d;
+  --color-juice-800: #903f11;
+  --color-juice-900: #763412;
+  --color-juice-950: #441a06;
+
+  /* Neutral / Slate */
+  --color-surface: #ffffff;
+  --color-surface-secondary: #f8fafc;
+  --color-surface-tertiary: #f1f5f9;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+
+  /* Status Colors */
+  --color-status-planning: #8b5cf6;
+  --color-status-agreement: #f59e0b;
+  --color-status-payment-setup: #3b82f6;
+  --color-status-active: #10b981;
+  --color-status-paused: #f97316;
+  --color-status-suspended: #ef4444;
+  --color-status-completed: #06b6d4;
+  --color-status-handed-off: #8b5cf6;
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Fonts */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}

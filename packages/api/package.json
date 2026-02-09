@@ -1,0 +1,23 @@
+{
+  "name": "@juicebox/api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./validators/*": "./src/validators/*.ts",
+    "./types": "./src/types.ts",
+    "./constants": "./src/constants.ts",
+    "./events": "./src/events.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@juicebox/config": "workspace:*",
+    "@juicebox/db": "workspace:*",
+    "typescript": "^5.9.2"
+  }
+}

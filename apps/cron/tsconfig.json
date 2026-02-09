@@ -1,0 +1,13 @@
+{
+  "extends": "@juicebox/config/tsconfig/base",
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "types": ["node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
